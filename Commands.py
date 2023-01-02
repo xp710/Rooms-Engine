@@ -4,7 +4,12 @@ import Rooms
 # Standard Gameplay Commands #
 ##############################
 
-def setUpScript(scriptName):
+def setUpScript(scriptName: str):
+    """
+    Takes a string for path of script and writes the script to a string.
+    :param scriptName: String for path of script
+    :return: string or bool
+    """
     if scriptName != False:
         with open(scriptName) as script:
             rawScript = ''
@@ -14,19 +19,37 @@ def setUpScript(scriptName):
     else:
         return False
 
-def findItem(x, y, name):
+def findItem(x: int, y: int, name: str):
+    """
+    Finds an item with the given name at the given coordinates and returns it.
+    :param x: x coordinate of object
+    :param y: y coordinate of object
+    :param name: name of object
+    :return: Item object or bool
+    """
     for i in Rooms.itemlist[x][y]:
         if name in i.name.lower():
             return i
     return False
 
-def startsWithVowel(word):
+def startsWithVowel(word: str):
+    """
+    Takes a word and tests if it starts with a vowel.
+    :param word: string
+    :return: bool
+    """
     if word.lower()[0] in 'aeiou':
         return True
     else:
         return False
 
-def basicLook(player, useEntered):
+def basicLook(player: object, useEntered: bool):
+    """
+    The base look function the look command is built on
+    :param player: player object
+    :param useEntered: decides whether to use the Room.display function
+    :return: None
+    """
     room = Rooms.roomlist[player.x][player.y]
     if useEntered:
         room.display(not room.entered)
@@ -45,7 +68,13 @@ def basicLook(player, useEntered):
         if exits[e]:
             print('There is an exit to the', e + '.')
 
-def checkForRooms(x, y):
+def checkForRooms(x: int, y: int):
+    """
+    Returns in which directions there are rooms from the room at the coordinates given.
+    :param x: x coord of room
+    :param y: y coord of room
+    :return: table of directions
+    """
     room = Rooms.roomlist[x][y]
     n = (not (Rooms.roomlist[x][y + 1] == 0) and Rooms.roomlist[x][y + 1].tags['visible'] and not room.walls['n'])
     e = (not (Rooms.roomlist[x + 1][y] == 0) and Rooms.roomlist[x + 1][y].tags['visible'] and not room.walls['e'])
@@ -53,7 +82,13 @@ def checkForRooms(x, y):
     w = (not (Rooms.roomlist[x - 1][y] == 0) and Rooms.roomlist[x - 1][y].tags['visible'] and not room.walls['w'])
     return {'north':n, 'east':e, 'south':s, 'west':w}
 
-def look(player, commands):
+def look(player: object, commands: list):
+    """
+    The look command
+    :param player: player object
+    :param commands: list of commands
+    :return: None
+    """
     if len(commands) == 1:
         basicLook(player, False)
 
@@ -71,13 +106,24 @@ def look(player, commands):
                     return
             print('Item not found.')
 
-def displayPicture(file):
+def displayPicture(file: str):
+    """
+    Prints every line of a file, intended for pictures.
+    :param file: string of path to file
+    :return: None
+    """
     with open(file) as pic:
         for line in pic:
             print(line, end='')
         print()
 
-def picture(player, commands):
+def picture(player: object, commands: list):
+    """
+    Tests if an item has a picture then displays it if it does.
+    :param player: player object
+    :param commands: list of commands
+    :return: None
+    """
     if len(commands) == 1:
         if hasattr(Rooms.roomlist[player.x][player.y], 'picture'):
             displayPicture(Rooms.roomlist[player.x][player.y].picture)
@@ -99,11 +145,25 @@ def picture(player, commands):
 
 
 
-def quit(player, commands):
+def quit(player: object, commands: list):
+    """
+    Ends the game loop.
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     Rooms.playGame = False
 
 
-def moveInDirection(player, commands, dx, dy):
+def moveInDirection(player: object, commands: list, dx: int, dy: int):
+    """
+    Moves the player dx spaces in the x direction and dy spaces in the y direction.
+    :param player: player object
+    :param commands: command list
+    :param dx: number of spaces to move right
+    :param dy: number of spaces to move up
+    :return: None
+    """
     # current position
     cx = player.x
     cy = player.y
@@ -130,23 +190,53 @@ def moveInDirection(player, commands, dx, dy):
         print('You can\'t move that way!')
 
 
-def moveNorth(player, commands):
+def moveNorth(player: object, commands: list):
+    """
+    Moves the player north
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     moveInDirection(player, commands, 0, 1)
 
 
-def moveSouth(player, commands):
+def moveSouth(player: object, commands: list):
+    """
+    Moves the player south
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     moveInDirection(player, commands, 0, -1)
 
 
-def moveEast(player, commands):
+def moveEast(player: object, commands: list):
+    """
+    Moves the player east
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     moveInDirection(player, commands, 1, 0)
 
 
-def moveWest(player, commands):
+def moveWest(player: object, commands: list):
+    """
+    Moves the player west
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     moveInDirection(player, commands, -1, 0)
 
 
-def toggleMode(player, commands):
+def toggleMode(player: object, commands: list):
+    """
+    Toggles the given mode on or off. Mode must be in Rooms.modes
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     try:
         Rooms.modes[commands[1]] = not Rooms.modes[commands[1]]
         if Rooms.modes[commands[1]] == True:
@@ -157,7 +247,13 @@ def toggleMode(player, commands):
         print('No such mode')
 
 
-def take(player, commands):
+def take(player: object, commands: list):
+    """
+    Removes the given object from Rooms.itemlist and adds it to player.inventory
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     item = findItem(player.x, player.y, commands[1])
     if item != False:
         if (item.tags['takeable']) or (Rooms.modes['devmode'] and commands[2] == 'override'):
@@ -171,7 +267,13 @@ def take(player, commands):
         print('Item not found.')
 
 
-def drop(player, commands):
+def drop(player: object, commands: list):
+    """
+    Removes the given object from player.inventory and adds it to Rooms.itemlist
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     for i in player.inventory:
         if commands[1] in i.name.lower():
             Rooms.itemlist[player.x][player.y].append(i)
@@ -183,6 +285,12 @@ def drop(player, commands):
 
 
 def checkInventory(player, commands):
+    """
+    Displays the contents of player.inventory
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     if len(commands) == 1:
         print('Inventory:')
         for i in player.inventory:
@@ -196,7 +304,13 @@ def checkInventory(player, commands):
         print('Item not found.')
 
 
-def use(player, commands):
+def use(player: object, commands: list):
+    """
+    Runs the Item.use function if the object given is useable
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     item = findItem(player.x, player.y, commands[1])
     if item == False:
         for i in player.inventory:
@@ -213,7 +327,13 @@ def use(player, commands):
         print('There\'s nothing to do with it')
 
 
-def help(player, commands):
+def help(player: object, commands: list):
+    """
+    Lists all the commands or gives help for the given command.
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     if len(commands) == 1:
         print('Type \"help [command]\" for even more help!')
         print('Commands:')
@@ -226,7 +346,13 @@ def help(player, commands):
 ################
 # Dev Commands #
 ################
-def getPlayerPos(player, commands):
+def getPlayerPos(player: object, commands: list):
+    """
+    Prints the player's position.
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     if len(commands) > 1:
         if commands[1] == 'x':
             print(player.x)
@@ -238,25 +364,49 @@ def getPlayerPos(player, commands):
         print('x:', player.x, 'y:', player.y)
 
 
-def teleport(player, commands):
+def teleport(player: object, commands: list):
+    """
+    Teleports the player to the given location
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     player.x = int(commands[1])
     player.y = int(commands[2])
 
-def devHelp(player, commands):
+def devHelp(player: object, commands: list):
+    """
+    Displays help for developer commands.
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     if len(commands) == 1:
         for c in Rooms.devInputs:
             print(c)
     else:
         print(Rooms.devInputs[commands[1]][1])
 
-def listRooms(player, commands):
+def listRooms(player: object, commands: list):
+    """
+    Lists the rooms in Rooms.roomlist
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     for x in range(len(Rooms.roomlist)):
         for y in range(len(Rooms.roomlist[x])):
             room = Rooms.roomlist[x][y]
             if hasattr(room, 'name'):
                 print(room.name, ': ', 'x =', x, 'y =', y)
 
-def console(player, commands):
+def console(player: object, commands: list):
+    """
+    Activates the in-game python console.
+    :param player: player object
+    :param commands: command list
+    :return: None
+    """
     print('Console activated. Type "stop" to stop.')
     pyLine = input('$ ')
     rawPython = ''
